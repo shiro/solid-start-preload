@@ -2,6 +2,7 @@
   "name": "solid-start-preload",
   "version": "0.1.1",
   "description": "SSR Preload CSS, scripts and assets in Solid Start",
+  "type": "module",
   "publishConfig": {
     "access": "public"
   },
@@ -17,8 +18,8 @@
   },
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build-fast": "tsup src/index.ts --format cjs,esm",
-    "build": "yarn build-fast -- --dts-resolve",
+    "build-fast": "tsup src/index.ts --format esm",
+    "build": "yarn build-fast --dts-resolve",
     "test": "vitest run",
     "prepublishOnly": "yarn build"
   },

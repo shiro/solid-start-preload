@@ -4,11 +4,11 @@ import path from "path";
 
 type Babel = typeof BabelCoreNamespace;
 
-interface Options {
-  routesFile: string;
-}
+// interface Options {
+//   routesFile: string;
+// }
 
-export const babelPlugin = (babel: Babel, options: Options): PluginObj => {
+export const babelPlugin = (babel: Babel): PluginObj => {
   const t = babel.types;
 
   let imported = false;
