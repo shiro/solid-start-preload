@@ -1,6 +1,6 @@
 {
     "name": "solid-start-preload",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "SSR Preload CSS, scripts and assets in Solid Start",
     "publishConfig": {
         "access": "public"
