@@ -14,32 +14,29 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/index/index.module.js",
-  "module": "./dist/index/index.module.js",
+  "main": "./dist/browser/index.module.js",
+  "module": "./dist/browser/index.module.js",
   "exports": {
     ".": {
-      "types": "./dist/index/index.d.ts",
-      "import": "./dist/index/index.module.js",
-      "solid": "./dist/source/my-lib.jsx",
-      "browser": "./dist/index/index.js",
-      "require": "./dist/index/index.js",
-      "node": "./dist/index/index.js"
+      "types": "./dist/browser/index.d.ts",
+      "import": "./dist/browser/index.module.js",
+      "browser": "./dist/browser/index.js",
+      "require": "./dist/browser/index.js",
+      "node": "./dist/browser/index.js"
     },
     "./server": {
       "types": "./dist/server/server.d.ts",
-      "import": "./dist/server/server.module.js",
-      "solid": "./dist/source/my-lib.jsx",
-      "browser": "./dist/server/server.js",
-      "require": "./dist/server/server.js",
-      "node": "./dist/server/server.js"
+      "import": "./dist/server/index.module.js",
+      "browser": "./dist/server/index.js",
+      "require": "./dist/server/index.js",
+      "node": "./dist/server/index.js"
     },
     "./babel": {
       "types": "./dist/babel/babel.d.ts",
-      "import": "./dist/babel/babel.module.js",
-      "solid": "./dist/source/my-lib.jsx",
-      "browser": "./dist/babel/babel.js",
-      "require": "./dist/babel/babel.js",
-      "node": "./dist/babel/babel.js"
+      "import": "./dist/babel/index.module.js",
+      "browser": "./dist/babel/index.js",
+      "require": "./dist/babel/index.js",
+      "node": "./dist/babel/index.js"
     }
   },
   "scripts": {

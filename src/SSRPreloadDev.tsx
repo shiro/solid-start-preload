@@ -1,12 +1,12 @@
 import path from "path";
-import { getManifest as getVinxiManifest } from "vinxi/manifest";
+import { type getManifest } from "vinxi/manifest";
 import { ModuleGraph } from "vite";
 import { createMatcher } from "./routerMatchingUtil";
 import { PreloadStartAssetsOptions } from "./server";
 import { getSSRManifest, isModuleIgnored } from "./util";
 
-const getModuleGraph = () => {
-  return getVinxiManifest("client").dev.server.moduleGraph;
+const getModuleGraph = (manifest: ReturnType<typeof getManifest>) => {
+  return manifest.dev.server.moduleGraph;
 };
 
 const fixUrl = (url: string) => (url.startsWith("/") ? url : "/" + url);
@@ -88,7 +88,7 @@ export const preloadSSRDev = (options: PreloadStartAssetsOptions) => {
   }
 
   const pathname = new URL(options.request.request.url).pathname;
-  const moduleGraph = getModuleGraph();
+  const moduleGraph = getModuleGraph(options.manifest);
 
   const filesToPreload: string[] = [];
   const inlineCSSToPreload: [string, string][] = [];

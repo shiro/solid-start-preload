@@ -1,11 +1,13 @@
 import { RequestEvent } from "solid-js/web";
 import { preloadSSR } from "./SSRPreload";
 import { preloadSSRDev } from "./SSRPreloadDev";
+import { type getManifest } from "vinxi/manifest";
 
 export { warmupRoutes } from "./warmupRoutes";
 
 export interface PreloadStartAssetsOptions {
   request: RequestEvent | undefined;
+  manifest: ReturnType<typeof getManifest>;
   ignorePatterns?:
     | string
     | RegExp
@@ -13,5 +15,7 @@ export interface PreloadStartAssetsOptions {
     | ((moduleId: string) => boolean);
 }
 export const preloadStartAssets = (options: PreloadStartAssetsOptions) => {
-  return import.meta.env.DEV ? preloadSSRDev(options) : preloadSSR(options);
+  return process.env.NODE_ENV == "production"
+    ? preloadSSR(options)
+    : preloadSSRDev(options);
 };

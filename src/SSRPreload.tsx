@@ -10,7 +10,10 @@ const manifest = fs.existsSync(VITE_MANIFEST_PATH)
   ? JSON.parse(fs.readFileSync(VITE_MANIFEST_PATH).toString())
   : {};
 
-const formatUrl = (url: string) => `${import.meta.env.SERVER_BASE_URL}/${url}`;
+// TODO pass this through the config since node_modules don't get meta replace
+// const base = import.meta.env.SERVER_BASE_URL;
+const base = "";
+const formatUrl = (url: string) => `${base}/${url}`;
 
 function renderAsset(url: string) {
   if (url.endsWith(".css")) return <link href={url} rel="stylesheet" />;
@@ -83,7 +86,7 @@ export const preloadSSR = (options: PreloadStartAssetsOptions) => {
   const matchers: [(path: string) => boolean, string[]][] = Object.entries(
     getSSRManifest()
   ).map(([pattern, value]) => [
-    createMatcher(`${import.meta.env.SERVER_BASE_URL}${pattern}`),
+    createMatcher(`${base}${pattern}`),
     value as string[],
   ]);
 
