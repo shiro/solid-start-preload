@@ -2,6 +2,7 @@
   "name": "solid-start-preload",
   "version": "0.1.1",
   "description": "SSR Preload CSS, scripts and assets in Solid Start",
+  "homepage": "https://github.com/shiro/solid-start-preload",
   "type": "module",
   "publishConfig": {
     "access": "public"

@@ -15,3 +15,5 @@ export interface PreloadStartAssetsOptions {
 export const preloadStartAssets = (options: PreloadStartAssetsOptions = {}) => {
   import.meta.env.DEV ? preloadSSRDev(options) : preloadSSR(options);
 };
+
+export { registerRoute } from "./registerRoute";
