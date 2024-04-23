@@ -17,7 +17,6 @@ function renderAsset(url: string) {
   if (url.endsWith(".js"))
     return <link rel="modulepreload" as="script" crossorigin="" href={url} />;
   if (url.endsWith(".woff2")) {
-    console.log("======== FOUND WOFF", url);
     return (
       <link
         rel="preload"
@@ -39,7 +38,7 @@ const collectRec = (
   output: string[],
   filename: string,
   manifest: Manifest,
-  options: PreloadStartAssetsOptions = {}
+  options: PreloadStartAssetsOptions
 ) => {
   const node = manifest[filename];
   if (!node) return;

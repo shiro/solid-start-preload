@@ -62,8 +62,6 @@ const collectRec = (
   if ([".css", ".scss"].some((x) => withoutQuery(node.url).endsWith(x))) {
     if (!node.transformResult?.code) return;
 
-    console.log("CSS", node.file);
-
     const start = 'const __vite__css = "';
     const end = '"\n__vite__updateStyle';
     let code = node.transformResult.code;
