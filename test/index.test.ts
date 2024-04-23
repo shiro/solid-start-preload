@@ -1,5 +1,5 @@
 import { test, assert } from "vitest";
-import { babel } from "../src";
+import { registerRoute } from "../src/index";
 import { vi } from "vitest";
 
 const IntersectionObserverMock = vi.fn(() => ({
@@ -12,5 +12,5 @@ const IntersectionObserverMock = vi.fn(() => ({
 vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
 
 test("simple", () => {
-  assert.equal(!!babel, true);
+  assert.equal(!!registerRoute, true);
 });

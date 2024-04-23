@@ -2,7 +2,10 @@
   "name": "solid-start-preload",
   "version": "0.1.1",
   "description": "SSR Preload CSS, scripts and assets in Solid Start",
-  "homepage": "https://github.com/shiro/solid-start-preload",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shiro/solid-start-preload"
+  },
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -14,23 +17,34 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "exports": {
-    "import": "./dist/index.js"
+    ".": {
+      "types": "./dist/index/index.d.ts",
+      "import": "./dist/index/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/server.d.ts",
+      "import": "./dist/server/server.js"
+    },
+    "./babel": {
+      "types": "./dist/babel/babel.d.ts",
+      "import": "./dist/babel/babel.js"
+    }
   },
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build-fast": "tsup src/index.ts --format esm",
-    "build": "yarn build-fast --dts-resolve",
+    "format": "prettier -w \"src/**/*.{js,ts,json,css,tsx,jsx}\"",
+    "build": "rollup -c rollup.config.js",
     "test": "vitest run",
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
+    "@solidjs/start": "1.0.0-rc.0",
     "@types/node": "20.12.7",
     "prettier": "3.2.5",
-    "tsup": "8.0.2",
+    "rollup-preset-solid": "2.0.1",
+    "solid-js": "*",
     "typescript": "5.4.5",
     "vinxi": "0.3.*",
-    "@solidjs/start": "1.0.0-rc.0",
-    "solid-js": "*",
     "vitest": "1.5.0"
   }
 }

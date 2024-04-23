@@ -8,10 +8,9 @@ type Babel = typeof BabelCoreNamespace;
 //   routesFile: string;
 // }
 
-export const babelPlugin = (babel: Babel): PluginObj => {
+export default (babel: Babel): PluginObj => {
   const t = babel.types;
 
-  let imported = false;
   let exclude = false;
   let isImported = false;
   let filename!: string;
@@ -19,9 +18,8 @@ export const babelPlugin = (babel: Babel): PluginObj => {
   return {
     visitor: {
       Program(p, state) {
-        imported = false;
-
         const f = state.file.opts.filename!;
+        // console.log("babel", f);
 
         exclude = !f?.endsWith(".tsx");
         filename = path.relative(process.cwd(), f);
@@ -30,7 +28,9 @@ export const babelPlugin = (babel: Babel): PluginObj => {
         if (exclude) return;
 
         const importSrc = p.node.source.value;
-        const isRegister = importSrc == "~/solid-start-preload";
+
+        // console.log("babel", importSrc);
+        const isRegister = importSrc == "solid-start-preload";
         if (isRegister) isImported = true;
       },
       CallExpression(p) {

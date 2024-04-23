@@ -1,9 +1,7 @@
 import fs from "fs";
-import { getRequestEvent } from "solid-js/web";
-import { PreloadStartAssetsOptions } from ".";
-import { SSRManifest } from "./registerRoute";
+import { PreloadStartAssetsOptions } from "./server";
 import { createMatcher } from "./routerMatchingUtil";
-import { base, isModuleIgnored } from "./util";
+import { getSSRManifest, isModuleIgnored } from "./util";
 
 type Manifest = Record<string, any>;
 
@@ -12,12 +10,24 @@ const manifest = fs.existsSync(VITE_MANIFEST_PATH)
   ? JSON.parse(fs.readFileSync(VITE_MANIFEST_PATH).toString())
   : {};
 
-const formatUrl = (url: string) => `${base}/${url}`;
+const formatUrl = (url: string) => `${import.meta.env.SERVER_BASE_URL}/${url}`;
 
 function renderAsset(url: string) {
   if (url.endsWith(".css")) return <link href={url} rel="stylesheet" />;
   if (url.endsWith(".js"))
     return <link rel="modulepreload" as="script" crossorigin="" href={url} />;
+  if (url.endsWith(".woff2")) {
+    console.log("======== FOUND WOFF", url);
+    return (
+      <link
+        rel="preload"
+        as="font"
+        type="font/woff2"
+        crossorigin=""
+        href={url}
+      />
+    );
+  }
 }
 
 const push = (set: string[], item: string) => {
@@ -34,19 +44,24 @@ const collectRec = (
   const node = manifest[filename];
   if (!node) return;
 
-  // ignore SSR bundles
-  if (node.name == "ssr" && !node.src) return;
+  // ignore SSR bundles, only grab assets like fonts
+  if (node.name == "ssr" && !node.src) {
+    for (const assetFilename of node.assets ?? []) {
+      if (output.some((x) => x == assetFilename)) continue;
+      push(output, assetFilename);
+    }
+    return;
+  }
 
   if (!isModuleIgnored(node.id, options.ignorePatterns)) {
     for (const jsFilename of node.imports ?? []) {
-      collectRec(output, jsFilename, manifest);
+      collectRec(output, jsFilename, manifest, options);
     }
   }
 
-  for (const cssFilename of node.css ?? []) {
-    if (output.some((x) => x == cssFilename)) continue;
-
-    push(output, cssFilename);
+  for (const assetFilename of [...(node.css ?? []), ...(node.assets ?? [])]) {
+    if (output.some((x) => x == assetFilename)) continue;
+    push(output, assetFilename);
   }
 
   if (node.file) {
@@ -58,23 +73,27 @@ const collectRec = (
 };
 
 export const preloadSSR = (options: PreloadStartAssetsOptions) => {
-  const pathname = new URL(getRequestEvent()!.request.url).pathname;
+  if (!options.request) {
+    console.warn("failed to preload: no request event");
+    return;
+  }
+
+  const pathname = new URL(options.request.request.url).pathname;
   const filesToPreload: string[] = [];
 
   const matchers: [(path: string) => boolean, string[]][] = Object.entries(
-    SSRManifest
+    getSSRManifest()
   ).map(([pattern, value]) => [
-    createMatcher(`${base}${pattern}`),
+    createMatcher(`${import.meta.env.SERVER_BASE_URL}${pattern}`),
     value as string[],
   ]);
 
   for (const [matcher, matches] of matchers) {
-    console.log("match?", pathname, !!matcher(pathname));
     if (matcher(pathname) == null) continue;
     for (const filename of matches) {
       collectRec(filesToPreload, filename, manifest, options);
     }
   }
 
-  return filesToPreload.map(formatUrl).map(renderAsset);
+  return filesToPreload.map(formatUrl).map(renderAsset).filter(Boolean);
 };

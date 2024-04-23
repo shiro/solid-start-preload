@@ -1,11 +1,9 @@
 import path from "path";
-import { getRequestEvent } from "solid-js/web";
 import { getManifest as getVinxiManifest } from "vinxi/manifest";
 import { ModuleGraph } from "vite";
 import { createMatcher } from "./routerMatchingUtil";
-import { SSRManifest } from "./registerRoute";
-import { PreloadStartAssetsOptions } from ".";
-import { isModuleIgnored } from "./util";
+import { PreloadStartAssetsOptions } from "./server";
+import { getSSRManifest, isModuleIgnored } from "./util";
 
 const getModuleGraph = () => {
   return getVinxiManifest("client").dev.server.moduleGraph;
@@ -42,7 +40,7 @@ const collectRec = (
   filepath: string,
   moduleGraph: ModuleGraph,
   visited: Set<String>,
-  options: PreloadStartAssetsOptions = {}
+  options: PreloadStartAssetsOptions
 ) => {
   const node = [
     ...(moduleGraph.fileToModulesMap.get(filepath)?.values() ?? []),
@@ -51,18 +49,20 @@ const collectRec = (
   if (visited.has(node.id)) return;
   visited.add(node.id);
 
-  const imports = [...node.clientImportedModules.values()];
-
   if (!isModuleIgnored(node.id!, options.ignorePatterns)) {
+    const imports = [...node.clientImportedModules.values()];
+
     for (const dep of imports) {
       if (!dep.file) continue;
 
-      collectRec(JSOutput, CSSOutput, dep.file, moduleGraph, visited);
+      collectRec(JSOutput, CSSOutput, dep.file, moduleGraph, visited, options);
     }
   }
 
   if ([".css", ".scss"].some((x) => withoutQuery(node.url).endsWith(x))) {
     if (!node.transformResult?.code) return;
+
+    console.log("CSS", node.file);
 
     const start = 'const __vite__css = "';
     const end = '"\n__vite__updateStyle';
@@ -81,10 +81,15 @@ const collectRec = (
 
 export const preloadSSRDev = (options: PreloadStartAssetsOptions) => {
   const matchers: [(path: string) => boolean, string[]][] = Object.entries(
-    SSRManifest
+    getSSRManifest()
   ).map(([pattern, value]) => [createMatcher(pattern), value as string[]]);
 
-  const pathname = new URL(getRequestEvent()!.request.url).pathname;
+  if (!options.request) {
+    console.warn("failed to preload: no request event");
+    return;
+  }
+
+  const pathname = new URL(options.request.request.url).pathname;
   const moduleGraph = getModuleGraph();
 
   const filesToPreload: string[] = [];
@@ -105,7 +110,6 @@ export const preloadSSRDev = (options: PreloadStartAssetsOptions) => {
   }
 
   return [
-    renderAsset("/fonts/inter-3.19-roman/Inter-Regular-Roman.woff2"),
     ...inlineCSSToPreload.map(([id, code]) => renderInlineCSS(id, code)),
     // ...filesToPreload.map(fixUrl).map(renderAsset),
   ];
