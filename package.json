@@ -14,8 +14,8 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "main": "./dist/index/index.js",
+  "module": "./dist/index/index.js",
   "exports": {
     ".": {
       "types": "./dist/index/index.d.ts",
@@ -30,7 +30,6 @@
       "import": "./dist/babel/babel.js"
     }
   },
-  "types": "./dist/index.d.ts",
   "scripts": {
     "format": "prettier -w \"src/**/*.{js,ts,json,css,tsx,jsx}\"",
     "build": "rollup -c rollup.config.js",
